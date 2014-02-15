@@ -55,18 +55,6 @@ function create() {
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
 
-    // Here we create the ground.
-   /* var ground = platforms.create(0, game.world.height - 64, 'ground');
-    ground.scale.setTo(2, 2);
-    ground.body.immovable = true;
-
-    ground = platforms.create(900, game.world.height - 64, 'ground');
-
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    ground.scale.setTo(2, 2);
-
-    //  This stops it from falling away when you jump on it
-    ground.body.immovable = true;*/
 
     //  Now let's create two ledges
     ledges = [];
@@ -146,10 +134,10 @@ function update() {
     game.physics.collide(stars, platforms);
     game.physics.collide(dogs, platforms);
     game.physics.collide(dogs, player);
-    game.physics.collide(dogs, sinfoBullets);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.overlap(player, stars, collectStar, null, this);
+    game.physics.overlap(dogs, sinfoBullets, killDog, null, this);
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
@@ -158,7 +146,7 @@ function update() {
         var bullet = sinfoBullets.create(player.x+30, player.y+40, 'sinfo');
         bullet.body.velocity.x = 500;
         canShoot = false;
-        setTimeout(function () { canShoot = true; }, 500);
+        setTimeout(function () { canShoot = true; }, 100);
     }
     else if (cursors.left.isDown) {
         //  Move to the left
@@ -197,6 +185,15 @@ function collectStar (player, star) {
 
     //  Add and update the score
     score += 10;
+    scoreText.content = 'Score: ' + score;
+
+}
+
+function killDog(bullet, dog) {
+    bullet.kill();
+    dog.kill();
+
+    score += 5;
     scoreText.content = 'Score: ' + score;
 
 }
