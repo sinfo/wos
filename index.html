@@ -36,10 +36,11 @@ var bossJason;
 var platforms;
 var cursors;
 var dogs;
-var bullets;
 var stars;
 var score = 0;
 var scoreText;
+
+var canShoot = true;
 
 var ledges;
 
@@ -132,7 +133,9 @@ function create() {
             dog.animations.add('move', [0, 1], 10, true);
             dog.animations.play('move');
 
-    }, 1000);
+    }, 750);
+
+
     
 }
 
@@ -143,6 +146,7 @@ function update() {
     game.physics.collide(stars, platforms);
     game.physics.collide(dogs, platforms);
     game.physics.collide(dogs, player);
+    game.physics.collide(dogs, bullet);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.overlap(player, stars, collectStar, null, this);
@@ -150,26 +154,29 @@ function update() {
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
-    if (cursors.left.isDown)
-    {
+    if (cursors.down.isDown && canShoot) {
+        var bullet = game.add.sprite(player.x, player.y, 'sinfo');
+        bullet.body.velocity.x = 250;
+        canShoot = false;
+        setTimeout(function () { canShoot = true; }, 500);
+    }
+    else if (cursors.left.isDown) {
         //  Move to the left
         player.body.velocity.x = -250;
 
         player.animations.play('left');
     }
-    else if (cursors.right.isDown)
-    {
+    else if (cursors.right.isDown) {
         //  Move to the right
         player.body.velocity.x = 250;
 
         player.animations.play('right');
     }
-    else
-    {
+    else {
         //  Stand still
         player.animations.stop();
 
-        player.frame = 1;
+        player.frame = 2;
     }
     
     //  Allow the player to jump if they are touching the ground.
