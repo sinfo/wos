@@ -19,12 +19,13 @@
 
 function preload() {
 
-    game.load.image('sky', 'assets/Sem.png');
+    game.load.image('sky', 'assets/sinfoLogo.png');
     game.load.spritesheet('dog', 'assets/enemyDog.png', 64, 64);
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/diamond.png');
     game.load.spritesheet('dude', 'assets/jorge.png', 32, 86);
-    game.load.image('sinfo','assets/sinfo2.png');
+    game.load.image('sinfo', 'assets/sinfo2.png');
+    game.load.image('jason', 'assets/bossJason.png');
 
 }
 
@@ -32,6 +33,7 @@ var worldSize=10000;
 
 var clouds;
 var player;
+var boss;
 var bossJason;
 var platforms;
 var sinfoBullets;
@@ -69,6 +71,8 @@ function create() {
 
     // The player and its settings
     player = game.add.sprite(32, 0, 'dude');
+    boss = game.add.sprite(60, 30, 'jason');
+    boss.body.gravity.y = 6;
 
     //camera
     game.camera.follow(player);
@@ -133,11 +137,13 @@ function update() {
     game.physics.collide(player, platforms);
     game.physics.collide(stars, platforms);
     game.physics.collide(dogs, platforms);
-    game.physics.collide(dogs, player);
+    game.physics.collide(boss, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.overlap(player, stars, collectStar, null, this);
     game.physics.overlap(dogs, sinfoBullets, killDog, null, this);
+    game.physics.overlap(dogs, player, killJorge, null, this);
+
 
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
@@ -195,6 +201,11 @@ function killDog(bullet, dog) {
 
     score += 5;
     scoreText.content = 'Score: ' + score;
+
+}
+
+function killJorge(bullet, dog) {
+    player.kill();
 
 }
 
