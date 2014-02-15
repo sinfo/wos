@@ -155,8 +155,8 @@ function update() {
     player.body.velocity.x = 0;
 
     if (cursors.down.isDown && canShoot) {
-        var bullet = sinfoBullets.create(player.x, player.y, 'sinfo');
-        bullet.body.velocity.x = 250;
+        var bullet = sinfoBullets.create(player.x+30, player.y+40, 'sinfo');
+        bullet.body.velocity.x = 500;
         canShoot = false;
         setTimeout(function () { canShoot = true; }, 500);
     }
