@@ -34,6 +34,7 @@ var clouds;
 var player;
 var bossJason;
 var platforms;
+var sinfoBullets;
 var cursors;
 var dogs;
 var stars;
@@ -114,7 +115,8 @@ function create() {
 
     //  Our controls.
     cursors = game.input.keyboard.createCursorKeys();
-
+    
+    sinfoBullets = game.add.group();
 
     // Dog physics properties. Give the little dog a big bounce.
     dogs = game.add.group();
@@ -134,8 +136,6 @@ function create() {
             dog.animations.play('move');
 
     }, 750);
-
-
     
 }
 
@@ -146,7 +146,7 @@ function update() {
     game.physics.collide(stars, platforms);
     game.physics.collide(dogs, platforms);
     game.physics.collide(dogs, player);
-    game.physics.collide(dogs, bullet);
+    game.physics.collide(dogs, sinfoBullets);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     game.physics.overlap(player, stars, collectStar, null, this);
@@ -155,7 +155,7 @@ function update() {
     player.body.velocity.x = 0;
 
     if (cursors.down.isDown && canShoot) {
-        var bullet = game.add.sprite(player.x, player.y, 'sinfo');
+        var bullet = sinfoBullets.create(player.x, player.y, 'sinfo');
         bullet.body.velocity.x = 250;
         canShoot = false;
         setTimeout(function () { canShoot = true; }, 500);
