@@ -114,7 +114,7 @@ function create() {
     dogs = game.add.group();
     setInterval(function () {
             //  Create a star inside of the 'stars' group
-            var dog = dogs.create(ledges[ledges.length-1].x, 0, 'dog');
+            var dog = dogs.create(boss.x - 48, boss.y, 'dog');
             
             dog.body.velocity.x = -getRandomInt(50, 300);
             //  Let gravity do its thing
