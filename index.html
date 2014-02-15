@@ -23,9 +23,8 @@ function preload() {
     game.load.spritesheet('dog', 'assets/enemyDog.png', 64, 64);
     game.load.image('ground', 'assets/p.png');
     game.load.image('star', 'assets/diamond.png');
-    game.load.spritesheet('dude', 'assets/baddie.png', 32, 32);
-    game.load.image('sinfo', 'assets/sinfo.png');
-    
+    game.load.spritesheet('dude', 'assets/jorge.png', 32, 86);
+    game.load.image('sinfo','assets/sinfo.png');
 
 }
 
@@ -36,9 +35,9 @@ var player;
 var bossJason;
 var platforms;
 var cursors;
-var sinfos;
-var stars;
 var dogs;
+var bullets;
+var stars;
 var score = 0;
 var scoreText;
 
@@ -90,8 +89,8 @@ function create() {
     player.body.collideWorldBounds = false;
 
     //  Our two animations, walking left and right.
-    player.animations.add('left', [0, 1], 10, true);
-    player.animations.add('right', [2, 3], 10, true);
+    player.animations.add('right', [0, 1, 2, 3], 10, true);
+    player.animations.add('left', [4, 5, 6, 7], 10, true);
 
     //  Finally some stars to collect
     stars = game.add.group();
@@ -119,24 +118,21 @@ function create() {
     // Dog physics properties. Give the little dog a big bounce.
     dogs = game.add.group();
     setInterval(function () {
-        //  Create a star inside of the 'stars' group
-        var dog = dogs.create(ledges[ledges.length - 1].x, 0, 'dog');
+            //  Create a star inside of the 'stars' group
+            var dog = dogs.create(ledges[ledges.length-1].x, 0, 'dog');
+            
+            dog.body.velocity.x = -getRandomInt(50, 300);
+            //  Let gravity do its thing
+            dog.body.gravity.y = getRandomInt(0, 15);
 
-        dog.body.velocity.x = -getRandomInt(50, 300);
-        //  Let gravity do its thing
-        dog.body.gravity.y = getRandomInt(0, 15);
+            //  This just gives each star a slightly random bounce value
+            dog.body.bounce.y = 1;
+            dog.body.bounce.x = 1;
 
-        //  This just gives each star a slightly random bounce value
-        dog.body.bounce.y = 1;
-        dog.body.bounce.x = 1;
-
-        dog.animations.add('move', [0, 1], 10, true);
-        dog.animations.play('move');
+            dog.animations.add('move', [0, 1], 10, true);
+            dog.animations.play('move');
 
     }, 1000);
-
-
-    sinfos = game.add.group();
     
 }
 
@@ -154,11 +150,7 @@ function update() {
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
-   if (cursors.down.ctrlKey) {
-        var sinfo = sinfos.create(player.x, player.y, 'sinfo');
-        sinfo.body.velocity.x = 200;
-    }
-    else if (cursors.left.isDown)
+    if (cursors.left.isDown)
     {
         //  Move to the left
         player.body.velocity.x = -250;
