@@ -19,7 +19,7 @@
 
 function preload() {
 
-    game.load.image('sky', 'assets/sinfoLogo.png');
+    game.load.image('sky', 'assets/Sem.png');
     game.load.spritesheet('dog', 'assets/enemyDog.png', 64, 64);
     game.load.image('ground', 'assets/platform.png');
     game.load.image('star', 'assets/diamond.png');
@@ -71,7 +71,7 @@ function create() {
 
     // The player and its settings
     player = game.add.sprite(32, 0, 'dude');
-    boss = game.add.sprite(60, 30, 'jason');
+    boss = game.add.sprite(ledges[ledges.length - 1].x, 0, 'jason');
     boss.body.gravity.y = 6;
 
     //camera
