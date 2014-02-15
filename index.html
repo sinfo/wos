@@ -125,6 +125,7 @@ function create() {
             dog.body.bounce.x = 1;
 
             dog.animations.add('move', [0, 1], 10, true);
+            dog.animations.add('geek', [2], 10, true);
             dog.animations.play('move');
 
     }, 750);
@@ -195,9 +196,14 @@ function collectStar (player, star) {
 
 }
 
-function killDog(bullet, dog) {
+function killDog(dog, bullet) {
     bullet.kill();
-    dog.kill();
+    //dog.kill();
+    dog.animations.play('geek');
+    dog.body.gravity.y = 0;
+    dog.body.velocity.x = 0;
+    dog.body.velocity.y = 0;
+    dog.y = window.innerHeight-64;
 
     score += 5;
     scoreText.content = 'Score: ' + score;
