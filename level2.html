@@ -5,9 +5,6 @@
     <title>World of SINFO - Sebastian Enrique</title>
     <script type="text/javascript" src="js/phaser.min.js"></script>
     <script type="text/javascript" src="js/misc.js"></script>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    
     <style type="text/css">
         body {
             margin: 0;
@@ -27,14 +24,13 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '
 
 function preload() {
 
-    game.load.image('sky', 'assets/Sem.png');
     game.load.image('banner', 'assets/banner.png');
     game.load.image('final', 'assets/finalEnrique.png');
-    game.load.spritesheet('dog', 'assets/ball.png', 32, 32);
+    game.load.spritesheet('enemy', 'assets/ball.png', 32, 32);
     game.load.image('ground', 'assets/platform.png');
     game.load.spritesheet('dude', 'assets/jorge.png', 32, 86);
     game.load.image('sinfo', 'assets/sinfo2.png');
-    game.load.image('jason', 'assets/bossEnrique.png');
+    game.load.image('boss', 'assets/bossEnrique.png');
 
 }
 
@@ -43,11 +39,10 @@ var worldSize=5000;
 var clouds;
 var player;
 var boss;
-var bossJason;
 var platforms;
 var sinfoBullets;
 var cursors;
-var dogs;
+var enemies;
 var score = 0;
 var scoreText,
     titleText;
@@ -61,8 +56,7 @@ function create() {
 
     game.world.setBounds(0, 0, worldSize, window.innerHeight);
 
-    //  A simple background for our game
-    //clouds = game.add.tileSprite(0, 0, worldSize, window.innerHeight, 'sky');    
+    //  A simple background for our game 
     game.stage.backgroundColor = '#9BD9E9';
     
     //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -88,7 +82,7 @@ function create() {
 
     // The player and its settings
     player = game.add.sprite(32, 0, 'dude');
-    boss = game.add.sprite(ledges[ledges.length - 1].x, 0, 'jason');
+    boss = game.add.sprite(ledges[ledges.length - 1].x, 0, 'boss');
     boss.body.gravity.y = 6;
 
     //camera
@@ -106,7 +100,7 @@ function create() {
     game.add.sprite((window.innerWidth-1024)/2, (window.innerHeight-768)/2, 'banner');
     
     //  The score
-    scoreText = game.add.text(16, 16, 'Level 2 Score: 0', { fontSize: '32px', fill: '#fff' });
+    scoreText = game.add.text(16, 16, 'Level 1 Score: 0', { fontSize: '32px', fill: '#fff' });
 
     //Created a Sprite with fixedToCamera = true
     var sprite = game.add.sprite(0,0);
@@ -125,13 +119,13 @@ function create() {
     sinfoBullets = game.add.group();
 
     // Dog physics properties. Give the little dog a big bounce.
-    dogs = game.add.group();
+    enemies = game.add.group();
     setInterval(function () {
         //  Create a star inside of the 'stars' group
-        var dog = dogs.create(boss.x - 48, boss.y, 'dog');
+        var dog = enemies.create(boss.x - 48, boss.y, 'enemy');
         
         dog.body.velocity.x = -getRandomInt(50, 300);
-        dog.body.velocity.y = -getRandomInt(100, 300);
+        dog.body.velocity.y = -getRandomInt(0, 300);
         //  Let gravity do its thing
         dog.body.gravity.y = getRandomInt(0, 15);
 
@@ -140,24 +134,22 @@ function create() {
         dog.body.bounce.x = 1;
 
         dog.animations.add('move', [0, 1], 10, true);
-        dog.animations.add('geek', [0], 10, true);
+        dog.animations.add('geek', [2], 10, true);
         dog.animations.play('move');
     }, 750);
-    
-    window.onMouseDown = onMouseDown;
 }
 
 function update() {
 
     //  Collide the player and the stars with the platforms
     game.physics.collide(player, platforms);
-    game.physics.collide(dogs, platforms);
+    game.physics.collide(enemies, platforms);
     game.physics.collide(boss, platforms);
     game.physics.collide(platforms, sinfoBullets);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    game.physics.overlap(dogs, sinfoBullets, killDog, null, this);
-    game.physics.overlap(dogs, player, killJorge, null, this);
+    game.physics.overlap(enemies, sinfoBullets, killEnemy, null, this);
+    game.physics.overlap(enemies, player, killPlayer, null, this);
 
 
     //  Reset the players velocity (movement)
@@ -167,15 +159,17 @@ function update() {
         var bullet;
         if (cursors.left.isDown) {
             bullet = sinfoBullets.create(player.x, player.y+40, 'sinfo');
-            bullet.body.velocity.x = -500;
+            bullet.body.velocity.x = -750;
         } else {
             bullet = sinfoBullets.create(player.x+30, player.y+40, 'sinfo');
-            bullet.body.velocity.x = 500;
+            bullet.body.velocity.x = 750;
         }
         //  This just gives each bullet a slightly random bounce value
         bullet.body.bounce.y = 0.5;
         bullet.body.bounce.x = 0.5;
         bullet.body.velocity.y = 100;
+
+        bullet.lifespan = 1500;
         canShoot = false;
         setTimeout(function () { canShoot = true; }, 100);
     }
@@ -204,8 +198,8 @@ function update() {
         player.body.velocity.y = -350;
     }
 
-    if(player.y > window.innerHeight || !player.alive) {
-        location.reload(false);
+    if(player.y > window.innerHeight) {
+        restartGame();
     }
 
     if(player.x > boss.x + 100) {
@@ -222,7 +216,7 @@ function update() {
     //clouds.tilePosition.y = -game.camera.y;
 }
 
-function killDog(dog, bullet) {
+function killEnemy(dog, bullet) {
     bullet.kill();
     //dog.kill();
     dog.animations.play('geek');
@@ -232,17 +226,42 @@ function killDog(dog, bullet) {
     dog.y = window.innerHeight-64;
 
     score += 5;
-    scoreText.content = 'Level 2 Score: ' + score;
+    scoreText.content = 'Level 1 Score: ' + score;
 
 }
 
-function killJorge(bullet, dog) {
-    player.kill();
-
+function killPlayer(enemy, player) {
+    restartGame();
 }
 
-function onMouseDown(evt){
+function restartGame(){
+    platforms.removeAll();
+    ledges = [];
+    ledges.push(platforms.create(0, window.innerHeight/2, 'ground'))
+    ledges[0].body.immovable = true;
 
+    for (var i = 1; ledges[i - 1].x < worldSize - 2*ledges[i - 1].width; i++)
+    {   
+        var ledgeX = ledges[i - 1].x + ledges[i-1].width + getRandomInt(0, 300);
+        var ledgeY = ledges[i - 1].y + getRandomInt(-100, 100);
+
+        if(ledgeY < 200) ledgeY = 200;
+        if(ledgeY > window.innerHeight - 100) ledgeY = window.innerHeight - 100;
+
+        ledges.push(platforms.create(ledgeX, ledgeY, 'ground'));
+        ledges[i].body.immovable = true;
+    }
+
+    player.x = 32; // Reset the players position
+    player.y = 32; // Reset the players position
+    sinfoBullets.removeAll();
+    enemies.removeAll();
+    score = 0;   // Reset the score to zero
+
+    boss.x = ledges[ledges.length - 1].x;
+    boss.y = 0;
+    
+    scoreText.content = 'Level 1 Score: ' + score;
 }
 
 </script>
