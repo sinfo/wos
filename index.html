@@ -20,7 +20,7 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update/*, render: render*/ });
 
 function preload() {
 
@@ -31,7 +31,9 @@ function preload() {
     game.load.spritesheet('dude', 'assets/jorge.png', 32, 86);
     game.load.image('sinfo', 'assets/sinfo.png');
     game.load.image('boss', 'assets/bossJason.png');
-
+    //Firefox nao lê ficheiros mp3
+    game.load.audio('musicTrack', /*'assets/Super Mario Bros. Soundtrack.mp3',*/ 'assets/XXI SINFO Trailer.ogg');
+    game.load.audio('jump', 'assets/Super Mario Bros - Mario Jump (Sound).ogg');
 }
 
 var worldSize=5000;
@@ -51,6 +53,9 @@ var canShoot = true;
 var ended = false;
 
 var ledges;
+var music;
+var jumpSound;
+var lives = 20;
 
 function create() {
 
@@ -62,6 +67,11 @@ function create() {
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
 
+    music = game.add.audio('musicTrack');
+    music.override = true;
+    music.play();
+
+    game.add.sprite((window.innerWidth - 1024) / 2, (window.innerHeight - 768) / 2, 'banner');
 
     //  Now let's create two ledges
     ledges = [];
@@ -97,10 +107,10 @@ function create() {
     player.animations.add('right', [0, 1, 2, 3], 10, true);
     player.animations.add('left', [4, 5, 6, 7], 10, true);
     
-    game.add.sprite((window.innerWidth-1024)/2, (window.innerHeight-768)/2, 'banner');
+    
     
     //  The score
-    scoreText = game.add.text(16, 16, 'Level 1 Score: 0', { fontSize: '32px', fill: '#fff' });
+    scoreText = game.add.text(16, 16, 'Level 1 Score: 0' + '\n' + 'Lives: ' + lives, { fontSize: '32px', fill: '#fff' });
 
     //Created a Sprite with fixedToCamera = true
     var sprite = game.add.sprite(0,0);
@@ -195,6 +205,10 @@ function update() {
     //  Allow the player to jump if they are touching the ground.
     if (cursors.up.isDown && player.body.touching.down)
     {
+        jumpSound = game.add.audio('jump');
+        jumpSound.override = true;
+        jumpSound.play();
+
         player.body.velocity.y = -350;
     }
 
@@ -208,7 +222,7 @@ function update() {
             game.add.sprite(player.x-1024/2, (window.innerHeight-768)/2, 'final');
             ended = true;
         } else if(player.x > boss.x + 500) {
-            location.href = "level2.html"
+            location.href = "level2.html?l=%" + lives + "%s=%" + score;
         }
     }
 
@@ -226,7 +240,7 @@ function killEnemy(dog, bullet) {
     dog.y = window.innerHeight-64;
 
     score += 5;
-    scoreText.content = 'Level 1 Score: ' + score;
+    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
 
 }
 
@@ -256,13 +270,19 @@ function restartGame(){
     player.y = 32; // Reset the players position
     sinfoBullets.removeAll();
     enemies.removeAll();
-    score = 0;   // Reset the score to zero
+    //score = 0;   // Reset the score to zero
 
     boss.x = ledges[ledges.length - 1].x;
     boss.y = 0;
-    
-    scoreText.content = 'Level 1 Score: ' + score;
+
+    lives = lives - 1;
+
+    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
 }
+/*
+function render() {
+    game.debug.renderSoundInfo(music, 20, 32);
+}*/
 
 </script>
 
