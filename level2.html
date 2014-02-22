@@ -28,7 +28,7 @@ function preload() {
     game.load.image('final', 'assets/finalEnrique.png');
     game.load.spritesheet('enemy', 'assets/ball.png', 32, 32);
     game.load.image('ground', 'assets/platform.png');
-    for(var i=0; i<=3; i++) {
+    for(var i=0; i<=18; i++) {
         game.load.spritesheet('dude'+i, 'assets/dude'+i+'.png', 32, 86);
     }
     game.load.image('sinfo', 'assets/sinfo.png');
@@ -60,7 +60,7 @@ var ended = false;
 var ledges;
 var music;
 var jumpSound;
-var lives = 3;
+var lives = 18;
 
 function create() {
 
