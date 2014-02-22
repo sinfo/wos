@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>World of SINFO - Sebastian Enrique</title>
+    <title>World of SINFO - Sebatian Enrique</title>
     <script type="text/javascript" src="js/phaser.min.js"></script>
     <script type="text/javascript" src="js/misc.js"></script>
     <style type="text/css">
@@ -20,7 +20,7 @@
 
 <script type="text/javascript">
 
-var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '', { preload: preload, create: create, update: update/*, render: render*/ });
 
 function preload() {
 
@@ -28,13 +28,17 @@ function preload() {
     game.load.image('final', 'assets/finalEnrique.png');
     game.load.spritesheet('enemy', 'assets/ball.png', 32, 32);
     game.load.image('ground', 'assets/platform.png');
-    game.load.spritesheet('dude', 'assets/jorge.png', 32, 86);
+    for(var i=0; i<=3; i++) {
+        game.load.spritesheet('dude'+i, 'assets/dude'+i+'.png', 32, 86);
+    }
     game.load.image('sinfo', 'assets/sinfo.png');
     game.load.image('boss', 'assets/bossEnrique.png');
     //Firefox nao lê ficheiros mp3
-    game.load.audio('musicTrack', /*'assets/Super Mario Bros. Soundtrack.mp3',*/ 'assets/XXI SINFO Trailer.ogg');
-    game.load.audio('jump', 'assets/Super Mario Bros - Mario Jump (Sound).ogg');
-
+    game.load.audio('musicTrack', /*'assets/Super Mario Bros. Soundtrack.mp3',*/ 'assets/banana');
+    game.load.audio('jump', 'assets/jump.wav');
+    game.load.audio('shoot', 'assets/shoot.wav');
+    game.load.audio('die', 'assets/die.wav');
+    game.load.audio('destroy', 'assets/destroy.wav');
 }
 
 var worldSize=5000;
@@ -53,16 +57,15 @@ var scoreText,
 var canShoot = true;
 var ended = false;
 
+var ledges;
 var music;
 var jumpSound;
-
-var ledges;
-
-var readFromURL = location.search;
-var livesRemain;
-var totalScore;
+var lives = 3;
 
 function create() {
+
+    lives = eval(getParameterByName("l")) || 3;
+    score = eval(getParameterByName("s")) || 0;
 
     game.world.setBounds(0, 0, worldSize, window.innerHeight);
 
@@ -71,7 +74,6 @@ function create() {
     
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = game.add.group();
-
 
     music = game.add.audio('musicTrack');
     music.override = true;
@@ -96,11 +98,12 @@ function create() {
         ledges[i].body.immovable = true;
     }
 
-    // The player and its settings
-    player = game.add.sprite(32, 0, 'dude');
     boss = game.add.sprite(ledges[ledges.length - 1].x, 0, 'boss');
     boss.body.gravity.y = 6;
 
+    // The player and its settings
+    player = game.add.sprite(32, 0, 'dude'+lives);
+    
     //camera
     game.camera.follow(player);
 
@@ -113,14 +116,10 @@ function create() {
     player.animations.add('right', [0, 1, 2, 3], 10, true);
     player.animations.add('left', [4, 5, 6, 7], 10, true);
     
-    //split URL string
-    var urlSplited = readFromURL.split("%");
-
-    livesRemain = urlSplited[1];
-    totalScore = urlSplited[3];
-
+    
+    
     //  The score
-    scoreText = game.add.text(16, 16, 'Level 1 Score: ' + totalScore + '\n' + 'Lives: ' + livesRemain, { fontSize: '32px', fill: '#fff' });
+    scoreText = game.add.text(16, 16, 'Level 1 Score: ' + score + '\nLives: ' + lives, { fontSize: '32px', fill: '#fff' });
 
     //Created a Sprite with fixedToCamera = true
     var sprite = game.add.sprite(0,0);
@@ -176,6 +175,11 @@ function update() {
     player.body.velocity.x = 0;
 
     if (cursors.down.isDown && canShoot) {
+
+        var shootSound = game.add.audio('shoot');
+        shootSound.override = true;
+        shootSound.play();
+
         var bullet;
         if (cursors.left.isDown) {
             bullet = sinfoBullets.create(player.x, player.y+40, 'sinfo');
@@ -215,11 +219,11 @@ function update() {
     //  Allow the player to jump if they are touching the ground.
     if (cursors.up.isDown && player.body.touching.down)
     {
-        jumpSound = game.add.audio('jump');
+        var jumpSound = game.add.audio('jump');
         jumpSound.override = true;
         jumpSound.play();
-        player.body.velocity.y = -350;
 
+        player.body.velocity.y = -350;
     }
 
     if(player.y > window.innerHeight) {
@@ -232,7 +236,7 @@ function update() {
             game.add.sprite(player.x-1024/2, (window.innerHeight-768)/2, 'final');
             ended = true;
         } else if(player.x > boss.x + 500) {
-            location.href = "level2.html?l=%" + lives + "%s=%" + score;
+            location.href = "level2.html?l=" + lives + "&s=" + score;
         }
     }
 
@@ -241,16 +245,20 @@ function update() {
 }
 
 function killEnemy(dog, bullet) {
+    var destroySound = game.add.audio('destroy');
+    destroySound.override = true;
+    destroySound.play();
+
     bullet.kill();
     //dog.kill();
     dog.animations.play('geek');
     dog.body.gravity.y = 0;
     dog.body.velocity.x = 0;
     dog.body.velocity.y = 0;
-    dog.y = window.innerHeight - 64;
+    dog.y = window.innerHeight-64;
 
     score += 5;
-    scoreText.content = 'Level 2 Score: ' + score + '\n' + 'Lives: ' + lives;
+    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
 
 }
 
@@ -259,6 +267,9 @@ function killPlayer(enemy, player) {
 }
 
 function restartGame(){
+    var dieSound = game.add.audio('die');
+    dieSound.override = true;
+    dieSound.play();
     platforms.removeAll();
     ledges = [];
     ledges.push(platforms.create(0, window.innerHeight/2, 'ground'))
@@ -284,8 +295,27 @@ function restartGame(){
 
     boss.x = ledges[ledges.length - 1].x;
     boss.y = 0;
-    
-    scoreText.content = 'Level 2 Score: ' + score + '\n' + 'Lives: ' + lives;
+
+    lives = lives - 1;
+
+    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
+    //player.kill();
+    player.loadTexture('dude'+lives);
+    //  Our two animations, walking left and right.
+    player.animations.add('right', [0, 1, 2, 3], 10, true);
+    player.animations.add('left', [4, 5, 6, 7], 10, true);
+
+}
+/*
+function render() {
+    game.debug.renderSoundInfo(music, 20, 32);
+}*/
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
 </script>
