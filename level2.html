@@ -26,6 +26,7 @@ function preload() {
 
     game.load.image('banner', 'assets/banner.png');
     game.load.image('final', 'assets/finalEnrique.png');
+    game.load.image('gameover', 'assets/gameover.png');
     game.load.spritesheet('enemy', 'assets/ball.png', 32, 32);
     game.load.image('ground', 'assets/platform.png');
     for(var i=0; i<=18; i++) {
@@ -64,7 +65,7 @@ var lives = 18;
 
 function create() {
 
-    lives = eval(getParameterByName("l")) || 3;
+    lives = eval(getParameterByName("l")) || 18;
     score = eval(getParameterByName("s")) || 0;
 
     game.world.setBounds(0, 0, worldSize, window.innerHeight);
@@ -271,45 +272,53 @@ function restartGame(){
     dieSound.override = true;
     dieSound.play();
     platforms.removeAll();
-    ledges = [];
-    ledges.push(platforms.create(0, window.innerHeight/2, 'ground'))
-    ledges[0].body.immovable = true;
-
-    for (var i = 1; ledges[i - 1].x < worldSize - 2*ledges[i - 1].width; i++)
-    {   
-        var ledgeX = ledges[i - 1].x + ledges[i-1].width + getRandomInt(0, 300);
-        var ledgeY = ledges[i - 1].y + getRandomInt(-100, 100);
-
-        if(ledgeY < 200) ledgeY = 200;
-        if(ledgeY > window.innerHeight - 100) ledgeY = window.innerHeight - 100;
-
-        ledges.push(platforms.create(ledgeX, ledgeY, 'ground'));
-        ledges[i].body.immovable = true;
-    }
-
-    player.x = 32; // Reset the players position
-    player.y = 32; // Reset the players position
     sinfoBullets.removeAll();
     enemies.removeAll();
     //score = 0;   // Reset the score to zero
 
-    boss.x = ledges[ledges.length - 1].x;
-    boss.y = 0;
 
     lives = lives - 1;
 
-    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
-    //player.kill();
-    player.loadTexture('dude'+lives);
-    //  Our two animations, walking left and right.
-    player.animations.add('right', [0, 1, 2, 3], 10, true);
-    player.animations.add('left', [4, 5, 6, 7], 10, true);
+    if (lives < 0) {
+        gameOver();
+    } else {
+        ledges = [];
+        ledges.push(platforms.create(0, window.innerHeight / 2, 'ground'))
+        ledges[0].body.immovable = true;
+
+        for (var i = 1; ledges[i - 1].x < worldSize - 2 * ledges[i - 1].width; i++) {
+            var ledgeX = ledges[i - 1].x + ledges[i - 1].width + getRandomInt(0, 300);
+            var ledgeY = ledges[i - 1].y + getRandomInt(-100, 100);
+
+            if (ledgeY < 200) ledgeY = 200;
+            if (ledgeY > window.innerHeight - 100) ledgeY = window.innerHeight - 100;
+
+            ledges.push(platforms.create(ledgeX, ledgeY, 'ground'));
+            ledges[i].body.immovable = true;
+        }
+
+        player.x = 32; // Reset the players position
+        player.y = 32; // Reset the players position
+
+
+        boss.x = ledges[ledges.length - 1].x;
+        boss.y = 0;
+
+        scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
+        //player.kill();
+        player.loadTexture('dude' + lives);
+        //  Our two animations, walking left and right.
+        player.animations.add('right', [0, 1, 2, 3], 10, true);
+        player.animations.add('left', [4, 5, 6, 7], 10, true);
+    }
 
 }
-/*
-function render() {
-    game.debug.renderSoundInfo(music, 20, 32);
-}*/
+
+function gameOver() {
+    player.kill();
+    game.add.sprite(game.camera.x, game.camera.y, 'gameover');
+    setInterval(function () { location.href = "index.html"; }, 5000);
+}
 
 function getParameterByName(name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
