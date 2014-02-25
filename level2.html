@@ -61,7 +61,8 @@ var ended = false;
 var ledges;
 var music;
 var jumpSound;
-var lives = 18;
+var lives;
+var banner;
 
 function create() {
 
@@ -80,7 +81,7 @@ function create() {
     music.override = true;
     music.play();
 
-    game.add.sprite((window.innerWidth - 1024) / 2, (window.innerHeight - 768) / 2, 'banner');
+    banner = game.add.sprite((window.innerWidth - 1024) / 2, (window.innerHeight - 768) / 2, 'banner');
 
     //  Now let's create two ledges
     ledges = [];
@@ -236,6 +237,7 @@ function update() {
         if( !ended) {
             game.add.sprite(player.x-1024/2, (window.innerHeight-768)/2, 'final');
             ended = true;
+            setTimeout(function () { location.href = "level2.html?l=" + lives + "&s=" + score; }, 5000);
         } else if(player.x > boss.x + 500) {
             location.href = "level2.html?l=" + lives + "&s=" + score;
         }
@@ -315,9 +317,10 @@ function restartGame(){
 }
 
 function gameOver() {
+    banner.kill();
     player.kill();
     game.add.sprite(game.camera.x, game.camera.y, 'gameover');
-    setInterval(function () { location.href = "index.html"; }, 5000);
+    setTimeout(function () { location.href = "index.html"; }, 5000);
 }
 
 function getParameterByName(name) {

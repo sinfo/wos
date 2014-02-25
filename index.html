@@ -62,6 +62,7 @@ var ledges;
 var music;
 var jumpSound;
 var lives;
+var banner;
 
 function create() {
 
@@ -80,7 +81,7 @@ function create() {
     music.override = true;
     music.play();
 
-    game.add.sprite((window.innerWidth - 1024) / 2, (window.innerHeight - 768) / 2, 'banner');
+    banner = game.add.sprite((window.innerWidth - 1024) / 2, (window.innerHeight - 768) / 2, 'banner');
 
     //  Now let's create two ledges
     ledges = [];
@@ -315,6 +316,7 @@ function restartGame(){
 }
 
 function gameOver() {
+    banner.kill();
     player.kill();
     game.add.sprite(game.camera.x, game.camera.y, 'gameover');
     setInterval(function () { location.href = "index.html"; }, 5000);
