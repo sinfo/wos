@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>World of SINFO - Sebatian Enrique</title>
+    <title>World of SINFO - João Couto</title>
     <script type="text/javascript" src="js/phaser.min.js"></script>
     <script type="text/javascript" src="js/misc.js"></script>
     <style type="text/css">
@@ -25,16 +25,16 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, '
 function preload() {
 
     game.load.image('banner', 'assets/banner.png');
-    game.load.image('final', 'assets/finalEnrique.png');
+    game.load.image('final', 'assets/finalCouto.png');
     game.load.image('gameover', 'assets/gameover.png');
-    game.load.spritesheet('enemy', 'assets/ball.png', 32, 32);
+    game.load.spritesheet('enemy', 'assets/cloud.png', 56, 56);
     game.load.image('ground', 'assets/platform.png');
-    for(var i=0; i<=18; i++) {
+    for(var i=0; i<=19; i++) {
         game.load.spritesheet('dude'+i, 'assets/dude'+i+'.png', 32, 86);
     }
     game.load.image('sinfo', 'assets/sinfo.png');
-    game.load.image('boss', 'assets/bossEnrique.png');
-    //Firefox nao l� ficheiros mp3
+    game.load.image('boss', 'assets/bossCouto.png');
+    //Firefox nao lê ficheiros mp3
     game.load.audio('musicTrack', /*'assets/Super Mario Bros. Soundtrack.mp3',*/ 'assets/banana');
     game.load.audio('jump', 'assets/jump.wav');
     game.load.audio('shoot', 'assets/shoot.wav');
@@ -66,7 +66,7 @@ var banner;
 
 function create() {
 
-    lives = eval(getParameterByName("l")) || 18;
+    lives = eval(getParameterByName("l")) || 19;
     score = eval(getParameterByName("s")) || 0;
 
     game.world.setBounds(0, 0, worldSize, window.innerHeight);
@@ -121,7 +121,7 @@ function create() {
     
     
     //  The score
-    scoreText = game.add.text(16, 16, 'Level 1 Score: ' + score + '\nLives: ' + lives, { fontSize: '32px', fill: '#fff' });
+    scoreText = game.add.text(16, 16, 'Level 6 Score: ' + score + '\nLives: ' + lives, { fontSize: '32px', fill: '#fff' });
 
     //Created a Sprite with fixedToCamera = true
     var sprite = game.add.sprite(0,0);
@@ -237,9 +237,9 @@ function update() {
         if( !ended) {
             game.add.sprite(player.x-1024/2, (window.innerHeight-768)/2, 'final');
             ended = true;
-            setTimeout(function () { location.href = "level2.html?l=" + lives + "&s=" + score; }, 5000);
+            setTimeout(function () { location.href = "levelTrina.html?l=" + lives + "&s=" + score; }, 5000);
         } else if(player.x > boss.x + 500) {
-            location.href = "level2.html?l=" + lives + "&s=" + score;
+            location.href = "levelTrina.html?l=" + lives + "&s=" + score;
         }
     }
 
@@ -261,7 +261,7 @@ function killEnemy(dog, bullet) {
     dog.y = window.innerHeight-64;
 
     score += 5;
-    scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
+    scoreText.content = 'Level 6 Score: ' + score + '\n' + 'Lives: ' + lives;
 
 }
 
@@ -306,7 +306,7 @@ function restartGame(){
         boss.x = ledges[ledges.length - 1].x;
         boss.y = 0;
 
-        scoreText.content = 'Level 1 Score: ' + score + '\n' + 'Lives: ' + lives;
+        scoreText.content = 'Level 5 Score: ' + score + '\n' + 'Lives: ' + lives;
         //player.kill();
         player.loadTexture('dude' + lives);
         //  Our two animations, walking left and right.
